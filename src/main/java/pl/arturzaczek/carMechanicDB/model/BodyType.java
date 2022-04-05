@@ -11,7 +11,7 @@ public enum BodyType {
     CROSSOVER("duży samochód łączący w sobie cechy kilku klas samochodów"),
     ELECTRIC("electric car - samochód elektryczny posiadający wyłącznie elektryczny silnik"),
     COMBI ("samochód typu kombi – o wydłużonej tylnej części"),
-    FASTbACK("nadwozie, w którym tylna część samochodu opada pod niewielkim kątem"),
+    FASTBACK("nadwozie, w którym tylna część samochodu opada pod niewielkim kątem"),
     HATCHBACK("hatchback - nadwozie, w którym tył samochodu jest „ścięty”"),
     HYBRID_CAR("samochód hybrydowy z silnikiem spalinowym i elektrycznym"),
     LIMOUSINE("limousine - wydłużony, luksusowy samochód z bogatym wyposażeniem typu barek, telefon itp."),

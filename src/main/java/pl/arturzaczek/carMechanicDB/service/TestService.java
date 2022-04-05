@@ -41,10 +41,10 @@ public class TestService {
 
         Address address = Address
                 .builder()
-                .city("Lodz")
                 .flatNo(5)
-                .postalCode("93-223")
+                .city("Lodz")
                 .street("Kutrowa")
+                .postalCode("93-223")
                 .build();
 
         Customer customer = Customer
@@ -59,8 +59,6 @@ public class TestService {
         vehicleRepo.saveAndFlush(vehicle);
         addressRepo.saveAndFlush(address);
         customerRepo.saveAndFlush(customer);
-
-
 
         final ServiceRequest sr = ServiceRequest.builder()
                 .comment("pierwszy sr")

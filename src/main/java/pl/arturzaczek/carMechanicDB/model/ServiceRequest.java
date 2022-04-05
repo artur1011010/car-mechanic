@@ -25,4 +25,5 @@ public class ServiceRequest {
     private double discount;
     @ManyToOne
     private Vehicle vehicle;
+
 }

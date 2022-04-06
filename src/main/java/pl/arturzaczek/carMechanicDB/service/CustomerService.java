@@ -1,20 +1,12 @@
 package pl.arturzaczek.carMechanicDB.service;
 
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Service;
-import pl.arturzaczek.carMechanicDB.jpa.CustomerRepo;
-import pl.arturzaczek.carMechanicDB.model.Customer;
+import pl.arturzaczek.carMechanicDB.rest.model.CreateCustomerRequest;
+import pl.arturzaczek.carMechanicDB.rest.model.CustomerResponse;
 
 import java.util.List;
 
-@Service
-@RequiredArgsConstructor
-public class CustomerService {
+public interface CustomerService {
+    List<CustomerResponse> getCustomers();
 
-    private final CustomerRepo customerRepo;
-
-    public List<Customer> getCustomers(){
-        return customerRepo.findAll();
-    }
-
+    Long createUser(CreateCustomerRequest customerRequest);
 }

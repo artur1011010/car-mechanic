@@ -36,4 +36,18 @@ public class ServiceRequestController {
         return ResponseEntity.ok(serviceRequestService.findSRByCustomerId(userId));
     }
 
+    @RequestMapping(
+            method = RequestMethod.POST,
+            value = "/service-request",
+            produces = "application/json; charset=UTF-8")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "Nie działa jeszcze! Save new Service Request for ")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ServiceRequestResponse[].class),
+            @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+            @ApiResponse(code = 404, message = "Not found", response = ApiErrorResponse.class)})
+    public ResponseEntity<Long> saveNewServiceRequest(@RequestParam Long userId){
+        return ResponseEntity.ok(1L);
+    }
+
 }

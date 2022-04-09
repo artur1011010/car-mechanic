@@ -41,27 +41,93 @@ public class TestService {
 
         Address address = Address
                 .builder()
-                .flatNo(5)
+                .streetNo(6)
                 .city("Lodz")
                 .street("Kutrowa")
                 .postalCode("93-223")
                 .build();
 
-        Customer customer = Customer
+        Address address2 = Address
                 .builder()
-                .email("aasa@gmail.com")
+                .streetNo(227)
+                .flatNo(8)
+                .city("Łódź")
+                .street("Kilińskiego")
+                .postalCode("93-122")
+                .build();
+
+        Address address3 = Address
+                .builder()
+                .streetNo(44)
+                .flatNo(7)
+                .city("Łódź")
+                .street("Radwańska")
+                .postalCode("93-003")
+                .build();
+
+        Customer customer1 = Customer
+                .builder()
+                .email("artur@gmail.com")
                 .lastName("Zaczek")
                 .name("Artur")
                 .address(address)
                 .build();
 
+        Customer customer2 = Customer
+                .builder()
+                .email("piotr@gmail.com")
+                .lastName("Chłopicki")
+                .name("Piotr")
+                .address(address3)
+                .build();
+
+        Customer customer3 = Customer
+                .builder()
+                .email("marcin@gmail.com")
+                .lastName("Sabaturski")
+                .name("Marcin")
+                .address(address2)
+                .build();
+
+        Customer customer4 = Customer
+                .builder()
+                .email("witalij@gmail.com")
+                .lastName("Sudnik")
+                .name("Witalij")
+                .address(address2)
+                .build();
+
+        Customer customer5 = Customer
+                .builder()
+                .email("grzegorz@gmail.com")
+                .lastName("Trojanowski")
+                .name("Grzegorz")
+                .address(address3)
+                .build();
+
+        Customer customer6 = Customer
+                .builder()
+                .email("mateusz@gmail.com")
+                .lastName("Sysio")
+                .name("Mateusz")
+                .address(address3)
+                .build();
+
+
         engineRepository.saveAndFlush(engine);
         vehicleRepository.saveAndFlush(vehicle);
         addressRepository.saveAndFlush(address);
-        customerRepository.save(customer);
+        addressRepository.saveAndFlush(address3);
+        addressRepository.saveAndFlush(address2);
+        customerRepository.save(customer1);
+        customerRepository.save(customer2);
+        customerRepository.save(customer3);
+        customerRepository.save(customer4);
+        customerRepository.save(customer5);
+        customerRepository.save(customer6);
 
         final ServiceRequest sr = ServiceRequest.builder()
-                .customer(customer)
+                .customer(customer1)
                 .comment("pierwszy sr")
                 .title("pierwszy sr")
                 .isDone(true)

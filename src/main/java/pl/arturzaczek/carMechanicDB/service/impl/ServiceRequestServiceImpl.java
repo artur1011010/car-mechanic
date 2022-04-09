@@ -12,7 +12,6 @@ import pl.arturzaczek.carMechanicDB.service.ServiceRequestService;
 import pl.arturzaczek.carMechanicDB.utils.ServiceRequestMapper;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -26,8 +25,9 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
 
     @Override
     public List<ServiceRequestResponse> findSRByCustomerId(final Long id) {
-        final Optional<Customer> customerOptional = customerRepository.findById(id);
-        final Customer customer = customerOptional.orElseThrow(() -> new NotFoundException("404", "User with id: " + id + " not found"));
+        final Customer customer = customerRepository
+                .findById(id)
+                .orElseThrow(() -> new NotFoundException("404", "User with id: " + id + " not found"));
         return serviceRequestRepository
                 .findServiceRequestByCustomer(customer)
                 .stream()

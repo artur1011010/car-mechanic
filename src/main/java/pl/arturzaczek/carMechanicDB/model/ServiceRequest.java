@@ -25,5 +25,9 @@ public class ServiceRequest {
     private double discount;
     @ManyToOne
     private Vehicle vehicle;
+    @ManyToOne @JoinColumn(name = "customer_id")
+    private Customer customer;
+
+
 
 }

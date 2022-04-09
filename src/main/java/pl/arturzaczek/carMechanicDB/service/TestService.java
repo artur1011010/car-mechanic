@@ -14,11 +14,11 @@ import java.time.LocalDate;
 @Slf4j
 @RequiredArgsConstructor
 public class TestService {
-    private final AddressRepo addressRepo;
-    private final CustomerRepo customerRepo;
-    private final EngineRepo engineRepo;
-    private final SRRepo srRepo;
-    private final VehicleRepo vehicleRepo;
+    private final AddressRepository addressRepository;
+    private final CustomerRepository customerRepository;
+    private final EngineRepository engineRepository;
+    private final ServiceRequestRepository serviceRequestRepository;
+    private final VehicleRepository vehicleRepository;
 
     @PostConstruct
     public void test(){
@@ -55,12 +55,13 @@ public class TestService {
                 .address(address)
                 .build();
 
-        engineRepo.saveAndFlush(engine);
-        vehicleRepo.saveAndFlush(vehicle);
-        addressRepo.saveAndFlush(address);
-        customerRepo.saveAndFlush(customer);
+        engineRepository.saveAndFlush(engine);
+        vehicleRepository.saveAndFlush(vehicle);
+        addressRepository.saveAndFlush(address);
+        customerRepository.save(customer);
 
         final ServiceRequest sr = ServiceRequest.builder()
+                .customer(customer)
                 .comment("pierwszy sr")
                 .title("pierwszy sr")
                 .isDone(true)
@@ -68,7 +69,7 @@ public class TestService {
                 .vehicle(vehicle)
                 .build();
 
-        srRepo.saveAndFlush(sr);
+        serviceRequestRepository.saveAndFlush(sr);
 
     }
 }

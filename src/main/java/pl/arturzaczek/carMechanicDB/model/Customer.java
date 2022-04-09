@@ -29,5 +29,7 @@ public class Customer {
     @JoinTable(name = "CUSTOMER_VEHICLE", joinColumns = {@JoinColumn(name = "CUSTOMER_ID")},
             inverseJoinColumns = {@JoinColumn(name = "VEHICLE_ID")})
     private Set<Vehicle> vehicleSet;
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "customer")
+    private Set<ServiceRequest> serviceRequestSet;
 
 }

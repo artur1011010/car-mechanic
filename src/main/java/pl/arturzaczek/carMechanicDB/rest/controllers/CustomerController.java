@@ -27,7 +27,7 @@ public class CustomerController {
             value = "/customer",
             produces = "application/json; charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Return list of all users")
+    @ApiOperation(value = "Return list of all customers")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = CustomerResponse[].class),
             @ApiResponse(code = 404, message = "Not found", response = ApiErrorResponse.class),
@@ -56,10 +56,10 @@ public class CustomerController {
             produces = "application/json; charset=UTF-8",
             consumes = "application/json; charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Create user",
-            notes = "This method creates a new user and return new created id")
+    @ApiOperation(value = "Create customer",
+            notes = "This method creates a new customer and return created id")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK - User successfully created with id", response = Long.class),
+            @ApiResponse(code = 200, message = "OK - User successfully created with id:", response = Long.class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
             @ApiResponse(code = 500, message = "Internal server error", response = ApiErrorResponse.class)})
     public ResponseEntity<Long> createCustomer(@RequestBody @Valid final CreateCustomerRequest customerRequest) {

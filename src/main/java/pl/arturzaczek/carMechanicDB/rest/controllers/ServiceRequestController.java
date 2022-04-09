@@ -28,7 +28,7 @@ public class ServiceRequestController {
             value = "/service-request",
             produces = "application/json; charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Return list service requests by user id")
+    @ApiOperation(value = "Return list service requests by customer id")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = ServiceRequestResponse[].class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
@@ -43,7 +43,7 @@ public class ServiceRequestController {
             consumes = "application/json; charset=UTF-8",
             produces = "application/json; charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Save new Service Request for specific user")
+    @ApiOperation(value = "Save new Service Request for specific customer")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = Long.class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),

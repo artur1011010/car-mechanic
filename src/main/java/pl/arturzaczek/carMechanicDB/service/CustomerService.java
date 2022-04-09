@@ -9,4 +9,6 @@ public interface CustomerService {
     List<CustomerResponse> getCustomers();
 
     Long createUser(CreateCustomerRequest customerRequest);
+
+    CustomerResponse getCustomer(Long id);
 }

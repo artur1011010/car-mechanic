@@ -9,6 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.arturzaczek.carMechanicDB.rest.error.ApiErrorResponse;
+import pl.arturzaczek.carMechanicDB.rest.model.CreateServiceRequest;
 import pl.arturzaczek.carMechanicDB.rest.model.ServiceRequestResponse;
 import pl.arturzaczek.carMechanicDB.service.ServiceRequestService;
 
@@ -27,27 +28,29 @@ public class ServiceRequestController {
             value = "/service-request",
             produces = "application/json; charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "return list service requests by user id")
+    @ApiOperation(value = "Return list service requests by user id")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = ServiceRequestResponse[].class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
             @ApiResponse(code = 404, message = "Not found", response = ApiErrorResponse.class)})
-    public ResponseEntity<List<ServiceRequestResponse>> findServiceRequestsByUserId(@RequestParam Long userId){
+    public ResponseEntity<List<ServiceRequestResponse>> findServiceRequestsByUserId(@RequestParam Long userId) {
         return ResponseEntity.ok(serviceRequestService.findSRByCustomerId(userId));
     }
 
     @RequestMapping(
             method = RequestMethod.POST,
             value = "/service-request",
+            consumes = "application/json; charset=UTF-8",
             produces = "application/json; charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Nie działa jeszcze! Save new Service Request for ")
+    @ApiOperation(value = "Save new Service Request for specific user")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = ServiceRequestResponse[].class),
+            @ApiResponse(code = 200, message = "OK", response = Long.class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
-            @ApiResponse(code = 404, message = "Not found", response = ApiErrorResponse.class)})
-    public ResponseEntity<Long> saveNewServiceRequest(@RequestParam Long userId){
-        return ResponseEntity.ok(1L);
+            @ApiResponse(code = 404, message = "Not found", response = ApiErrorResponse.class),
+            @ApiResponse(code = 500, message = "Internal server error", response = ApiErrorResponse.class)})
+    public ResponseEntity<Long> saveNewServiceRequest(@RequestBody CreateServiceRequest request, @RequestParam Long userId, @RequestParam Long vehicleId) {
+        return ResponseEntity.ok(serviceRequestService.createSR(request, userId, vehicleId));
     }
 
 }

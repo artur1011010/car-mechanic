@@ -57,7 +57,7 @@ public class CustomerController {
             consumes = "application/json; charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
     @ApiOperation(value = "Create customer",
-            notes = "This method creates a new customer and return created id")
+            notes = "Creates a new customer and return created id")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK - User successfully created with id:", response = Long.class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),

@@ -13,6 +13,7 @@ import pl.arturzaczek.carMechanicDB.rest.model.CreateServiceRequest;
 import pl.arturzaczek.carMechanicDB.rest.model.ServiceRequestResponse;
 import pl.arturzaczek.carMechanicDB.service.ServiceRequestService;
 
+import javax.validation.Valid;
 import java.util.List;
 
 @RestController
@@ -43,13 +44,14 @@ public class ServiceRequestController {
             consumes = "application/json; charset=UTF-8",
             produces = "application/json; charset=UTF-8")
     @ResponseStatus(HttpStatus.OK)
-    @ApiOperation(value = "Save new Service Request for specific customer")
+    @ApiOperation(value = "Create new Service Request for specific customer id",
+    notes = "Service creates new Service Request, takes body:\n- CreateServiceRequest \nand 2 query params: \n- userId\n- vehicleId")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "OK", response = Long.class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
             @ApiResponse(code = 404, message = "Not found", response = ApiErrorResponse.class),
             @ApiResponse(code = 500, message = "Internal server error", response = ApiErrorResponse.class)})
-    public ResponseEntity<Long> saveNewServiceRequest(@RequestBody CreateServiceRequest request, @RequestParam Long userId, @RequestParam Long vehicleId) {
+    public ResponseEntity<Long> saveNewServiceRequest(@RequestBody @Valid CreateServiceRequest request, @RequestParam Long userId, @RequestParam Long vehicleId) {
         return ResponseEntity.ok(serviceRequestService.createSR(request, userId, vehicleId));
     }
 

@@ -9,9 +9,9 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>pl.arturzaczek</groupId>
-	<artifactId>carMechanicDB </artifactId>
+	<artifactId>carMechanicDB</artifactId>
 	<version>0.0.3-SNAPSHOT</version>
-	<name>carMechanicDB </name>
+	<name>carMechanicDB</name>
 	<description>Demo project for Spring Boot</description>
 	<properties>
 		<java.version>11</java.version>

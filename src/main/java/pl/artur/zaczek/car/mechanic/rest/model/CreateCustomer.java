@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -12,7 +13,8 @@ import javax.validation.constraints.NotNull;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class CreateCustomerRequest {
+@Valid
+public class CreateCustomer {
     @NotNull
     private boolean isCompany;
     private String companyName;
@@ -21,7 +23,7 @@ public class CreateCustomerRequest {
     private String name;
     @NotBlank
     private String lastName;
-    private AddressRequest address;
+    private AddressDTO address;
     @NotBlank
     private String email;
     @NotBlank

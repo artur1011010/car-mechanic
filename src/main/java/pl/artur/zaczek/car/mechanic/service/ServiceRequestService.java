@@ -4,9 +4,11 @@ import pl.artur.zaczek.car.mechanic.rest.model.CreateServiceRequest;
 import pl.artur.zaczek.car.mechanic.rest.model.ServiceRequestResponse;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ServiceRequestService {
-    List<ServiceRequestResponse> findSRByCustomerId(Long id);
-
-    Long createSR(CreateServiceRequest request, Long userId, Long vehicleId);
+    List<ServiceRequestResponse> findSRByCustomerId(Long customerId);
+    List<ServiceRequestResponse> findSRByVehicleId(Long vehicleId);
+    List<ServiceRequestResponse> findSR(Optional<Long> vehicleId, Optional<Long> customerId);
+    Long createSR(CreateServiceRequest request, Long customerId, Long vehicleId);
 }

@@ -20,5 +20,5 @@ public class ServiceRequestResponse {
     private LocalDateTime finishTime;
     private boolean isDone;
     private BigDecimal price;
-    private double discount;
+    private BigDecimal discount;
 }

@@ -16,7 +16,7 @@ import pl.artur.zaczek.car.mechanic.model.ServiceRequest;
 import pl.artur.zaczek.car.mechanic.model.Vehicle;
 import pl.artur.zaczek.car.mechanic.rest.error.BadRequestException;
 import pl.artur.zaczek.car.mechanic.rest.error.NotFoundException;
-import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomerRequest;
+import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomer;
 import pl.artur.zaczek.car.mechanic.rest.model.CustomerResponse;
 import pl.artur.zaczek.car.mechanic.utils.CustomerMapper;
 
@@ -89,7 +89,7 @@ class CustomerServiceImplTest {
     @Test
     @DisplayName("should throw BadRequestException when request is not valid - no nip")
     public void shouldThrowBadRequestExceptionWhenRequestIsNotValidNoNip() {
-        CreateCustomerRequest request = CreateCustomerRequest.builder()
+        final CreateCustomer request = CreateCustomer.builder()
                 .isCompany(true)
                 .companyName("Comp name")
                 .build();
@@ -100,7 +100,7 @@ class CustomerServiceImplTest {
     @Test
     @DisplayName("should throw BadRequestException when request is not valid - no comp name")
     public void shouldThrowBadRequestExceptionWhenRequestIsNotValidNoCompName() {
-        CreateCustomerRequest request = CreateCustomerRequest.builder()
+        final CreateCustomer request = CreateCustomer.builder()
                 .isCompany(true)
                 .companyNip("59949343")
                 .build();
@@ -111,7 +111,7 @@ class CustomerServiceImplTest {
     @Test
     @DisplayName("should throw BadRequestException when request is not valid - no comp name and nip")
     public void shouldThrowBadRequestExceptionWhenRequestIsNotValidNoCompNameNoNip() {
-        CreateCustomerRequest request = CreateCustomerRequest.builder()
+        final CreateCustomer request = CreateCustomer.builder()
                 .isCompany(true)
                 .build();
         assertThrows(BadRequestException.class,
@@ -123,7 +123,7 @@ class CustomerServiceImplTest {
     public void shouldThrowNotFoundExceptionWhenCustomerNotFound() {
         Mockito.when(customerRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class,
-                () -> customerService.getCustomer(1L));
+                () -> customerService.getCustomerById(1L));
     }
 
     @Test
@@ -142,7 +142,7 @@ class CustomerServiceImplTest {
                 .build();
         //when
         Mockito.when(customerRepository.findById(1L)).thenReturn(Optional.of(customer));
-        final CustomerResponse actualResponse = customerService.getCustomer(1L);
+        final CustomerResponse actualResponse = customerService.getCustomerById(1L);
         //then
         assertEquals(expectedResponse, actualResponse);
 

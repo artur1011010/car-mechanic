@@ -22,7 +22,7 @@ public class ServiceRequest {
     private LocalDateTime finishTime;
     private boolean isDone;
     private BigDecimal price;
-    private double discount;
+    private BigDecimal discount;
     @ManyToOne
     private Vehicle vehicle;
     @ManyToOne @JoinColumn(name = "customer_id")

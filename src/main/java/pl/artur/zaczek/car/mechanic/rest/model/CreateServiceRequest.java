@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
@@ -14,6 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Valid
 public class CreateServiceRequest {
     @NotBlank
     private String title;
@@ -25,5 +27,5 @@ public class CreateServiceRequest {
     @NotNull
     private boolean isDone;
     private BigDecimal price;
-    private double discount;
+    private BigDecimal discount;
 }

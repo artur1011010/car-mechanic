@@ -9,7 +9,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.artur.zaczek.car.mechanic.rest.error.ApiErrorResponse;
-import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomerRequest;
+import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomer;
 import pl.artur.zaczek.car.mechanic.rest.model.CustomerResponse;
 import pl.artur.zaczek.car.mechanic.service.CustomerService;
 
@@ -51,7 +51,7 @@ public class CustomerController {
             @ApiResponse(code = 500, message = "Internal server error", response = ApiErrorResponse.class)})
     public ResponseEntity<CustomerResponse> getCustomer(@PathVariable final Long id) {
         log.info("GET api/customer/{} ", id);
-        return ResponseEntity.ok(customerService.getCustomer(id));
+        return ResponseEntity.ok(customerService.getCustomerById(id));
     }
 
     @RequestMapping(
@@ -66,7 +66,7 @@ public class CustomerController {
             @ApiResponse(code = 200, message = "OK - User successfully created with id:", response = Long.class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
             @ApiResponse(code = 500, message = "Internal server error", response = ApiErrorResponse.class)})
-    public ResponseEntity<Long> createCustomer(@RequestBody @Valid final CreateCustomerRequest customerRequest) {
+    public ResponseEntity<Long> createCustomer(@RequestBody @Valid final CreateCustomer customerRequest) {
         log.info("POST api/customer with requestBody=\n{}", customerRequest);
         return ResponseEntity.ok(customerService.createUser(customerRequest));
     }

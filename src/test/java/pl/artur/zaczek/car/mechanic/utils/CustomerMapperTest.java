@@ -9,7 +9,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.artur.zaczek.car.mechanic.model.Customer;
 import pl.artur.zaczek.car.mechanic.model.ServiceRequest;
 import pl.artur.zaczek.car.mechanic.model.Vehicle;
-import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomerRequest;
+import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomer;
 import pl.artur.zaczek.car.mechanic.rest.model.CustomerResponse;
 
 
@@ -64,7 +64,7 @@ class CustomerMapperTest {
                 .phoneNo("500600700")
                 .build();
 
-        final CreateCustomerRequest input = CreateCustomerRequest.builder()
+        final CreateCustomer input = CreateCustomer.builder()
                 .name("name")
                 .lastName("lastName")
                 .email("mail@mail.com")

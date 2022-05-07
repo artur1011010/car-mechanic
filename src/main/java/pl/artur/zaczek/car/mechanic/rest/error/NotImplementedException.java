@@ -5,14 +5,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Getter
-@ResponseStatus(code = HttpStatus.BAD_REQUEST)
-public class BadRequestException extends BaseApiError {
-
-    public BadRequestException(String message, String code) {
+@ResponseStatus(code = HttpStatus.NOT_IMPLEMENTED)
+public class NotImplementedException extends BaseApiError{
+    public NotImplementedException(String message, String code) {
         super(message, code);
     }
 
-    public BadRequestException(String message, String code, String details) {
+    public NotImplementedException(String message, String code, String details) {
         super(message, code, details);
     }
 }

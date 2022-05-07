@@ -4,10 +4,13 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import pl.artur.zaczek.car.mechanic.model.Customer;
 import pl.artur.zaczek.car.mechanic.model.ServiceRequest;
+import pl.artur.zaczek.car.mechanic.model.Vehicle;
 
 import java.util.List;
 
 @Repository
 public interface ServiceRequestRepository extends JpaRepository<ServiceRequest, Long> {
-    List<ServiceRequest> findServiceRequestByCustomer (Customer customer);
+    List<ServiceRequest> findServiceRequestByCustomer(Customer customer);
+
+    List<ServiceRequest> findServiceRequestsByVehicle(Vehicle customer);
 }

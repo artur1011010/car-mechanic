@@ -1,6 +1,6 @@
 package pl.artur.zaczek.car.mechanic.service;
 
-import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomerRequest;
+import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomer;
 import pl.artur.zaczek.car.mechanic.rest.model.CustomerResponse;
 
 import java.util.List;
@@ -8,7 +8,7 @@ import java.util.List;
 public interface CustomerService {
     List<CustomerResponse> getCustomers();
 
-    Long createUser(CreateCustomerRequest customerRequest);
+    Long createUser(CreateCustomer customerRequest);
 
-    CustomerResponse getCustomer(Long id);
+    CustomerResponse getCustomerById(Long id);
 }

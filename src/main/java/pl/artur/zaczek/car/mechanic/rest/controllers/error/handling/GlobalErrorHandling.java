@@ -8,9 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import pl.artur.zaczek.car.mechanic.rest.error.ApiErrorResponse;
-import pl.artur.zaczek.car.mechanic.rest.error.BaseApiError;
-import pl.artur.zaczek.car.mechanic.rest.error.NotFoundException;
+import pl.artur.zaczek.car.mechanic.rest.error.*;
 
 @ControllerAdvice
 public class GlobalErrorHandling extends ResponseEntityExceptionHandler {
@@ -30,11 +28,21 @@ public class GlobalErrorHandling extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(createErrorMessage(ex));
     }
 
+    @ExceptionHandler(value = BadRequestException.class)
+    protected ResponseEntity<Object> handleBadRequestException(BaseApiError ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(createErrorMessage(ex));
+    }
+
+    @ExceptionHandler(value = NotImplementedException.class)
+    protected ResponseEntity<Object> handleNotImplementedException(BaseApiError ex) {
+        return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(createErrorMessage(ex));
+    }
+
     private ApiErrorResponse createErrorMessage(BaseApiError ex){
         return ApiErrorResponse.builder()
                 .message(ex.getMessage())
                 .code(ex.getCode())
-                .details(ex.getDetails())
+//                .details(ex.getDetails())
                 .build();
     }
 }

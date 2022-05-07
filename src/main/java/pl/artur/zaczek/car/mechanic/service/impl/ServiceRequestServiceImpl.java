@@ -2,20 +2,25 @@ package pl.artur.zaczek.car.mechanic.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.artur.zaczek.car.mechanic.jpa.CustomerRepository;
 import pl.artur.zaczek.car.mechanic.jpa.ServiceRequestRepository;
 import pl.artur.zaczek.car.mechanic.jpa.VehicleRepository;
 import pl.artur.zaczek.car.mechanic.model.Customer;
 import pl.artur.zaczek.car.mechanic.model.ServiceRequest;
 import pl.artur.zaczek.car.mechanic.model.Vehicle;
-import pl.artur.zaczek.car.mechanic.rest.model.CreateServiceRequest;
+import pl.artur.zaczek.car.mechanic.rest.error.BadRequestException;
 import pl.artur.zaczek.car.mechanic.rest.error.NotFoundException;
+import pl.artur.zaczek.car.mechanic.rest.error.NotImplementedException;
+import pl.artur.zaczek.car.mechanic.rest.model.CreateServiceRequest;
 import pl.artur.zaczek.car.mechanic.rest.model.ServiceRequestResponse;
 import pl.artur.zaczek.car.mechanic.service.ServiceRequestService;
 import pl.artur.zaczek.car.mechanic.utils.ServiceRequestMapper;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -29,12 +34,28 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
     private final VehicleRepository vehicleRepository;
 
     @Override
-    public List<ServiceRequestResponse> findSRByCustomerId(final Long userId) {
+
+    public List<ServiceRequestResponse> findSR(final Optional<Long> customerId, final Optional<Long> vehicleId) {
+        if (customerId.isEmpty() && vehicleId.isEmpty()) {
+            log.error("vehicleId:{} and customerId:{} is empty", vehicleId, customerId);
+            throw new BadRequestException("VehicleId and customerId is empty", HttpStatus.BAD_REQUEST.name());
+        } else if (vehicleId.isPresent() && customerId.isEmpty()) {
+            return findSRByVehicleId(vehicleId.get());
+        } else if (customerId.isPresent() && vehicleId.isEmpty()) {
+            return findSRByCustomerId(customerId.get());
+        } else {
+            log.error("vehicleId:{} and customerId:{}", vehicleId, customerId);
+            throw new NotImplementedException("VehicleId " + vehicleId.get() + " and customerId " + customerId.get(), HttpStatus.NOT_IMPLEMENTED.name());
+        }
+    }
+
+    @Override
+    public List<ServiceRequestResponse> findSRByCustomerId(final Long customerId) {
         final Customer customer = customerRepository
-                .findById(userId)
+                .findById(customerId)
                 .orElseThrow(() -> {
-                    log.error("User not found for user id:{}", userId);
-                    throw new NotFoundException("404", "User with id: " + userId + " not found");
+                    log.error("Customer not found for customerid:{}", customerId);
+                    throw new NotFoundException("Customer with id: " + customerId + " not found", HttpStatus.NOT_FOUND.name());
                 });
         return serviceRequestRepository
                 .findServiceRequestByCustomer(customer)
@@ -44,24 +65,40 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
     }
 
     @Override
-    public Long createSR(final CreateServiceRequest request, final Long userId, final Long vehicleId) {
-        final Customer customer = customerRepository
-                .findById(userId)
+    public List<ServiceRequestResponse> findSRByVehicleId(final Long vehicleId) {
+        final Vehicle vehicle = vehicleRepository.findById(vehicleId)
                 .orElseThrow(() -> {
-                    log.error("User not found for user id:{}\nrequest:{}", userId, request);
-                    throw new NotFoundException("404", "User with id: " + userId + " not found");
+                    log.error("Vehicle not found for vehicle id:{}", vehicleId);
+                    throw new NotFoundException("Vehicle with id: " + vehicleId + " not found", HttpStatus.NOT_FOUND.name());
                 });
+        return serviceRequestRepository
+                .findServiceRequestsByVehicle(vehicle)
+                .stream()
+                .map(serviceRequestMapper::ToServiceRequestResponse)
+                .collect(Collectors.toList());
+    }
 
+    @Override
+    @Transactional
+    public Long createSR(final CreateServiceRequest request, final Long customerId, final Long vehicleId) {
+        final Customer customer = customerRepository
+                .findById(customerId)
+                .orElseThrow(() -> {
+                    log.error("Customer not found for customer id:{}\nrequest:{}", customerId, request);
+                    throw new NotFoundException("Customer with id: " + customerId + " not found", HttpStatus.NOT_FOUND.name());
+                });
         final Vehicle vehicle = vehicleRepository
                 .findById(vehicleId)
                 .orElseThrow(() -> {
                     log.error("Vehicle not found for id:{}\nrequest:{}", vehicleId, request);
-                    throw new NotFoundException("404", "Vehicle with id: " + vehicleId + " not found");
+                    throw new NotFoundException("Vehicle with id: " + vehicleId + " not found", HttpStatus.NOT_FOUND.name());
                 });
         final ServiceRequest serviceRequest = serviceRequestMapper.ToServiceRequest(request);
+        vehicle.addCustomer(customer);
         serviceRequest.setCustomer(customer);
         serviceRequest.setVehicle(vehicle);
         serviceRequestRepository.save(serviceRequest);
+        vehicleRepository.save(vehicle);
         return serviceRequest.getId();
     }
 }

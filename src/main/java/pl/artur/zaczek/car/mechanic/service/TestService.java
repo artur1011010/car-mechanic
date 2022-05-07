@@ -125,7 +125,6 @@ public class TestService {
                 .build();
 
 
-        engineRepository.saveAndFlush(engine);
         vehicleRepository.saveAndFlush(vehicle);
         addressRepository.saveAndFlush(address);
         addressRepository.saveAndFlush(address3);

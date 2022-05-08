@@ -145,7 +145,5 @@ class CustomerServiceImplTest {
         final CustomerResponse actualResponse = customerService.getCustomerById(1L);
         //then
         assertEquals(expectedResponse, actualResponse);
-
     }
-
 }

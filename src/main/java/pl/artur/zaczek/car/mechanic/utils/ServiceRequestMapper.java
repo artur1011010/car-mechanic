@@ -8,8 +8,8 @@ import pl.artur.zaczek.car.mechanic.rest.model.ServiceRequestResponse;
 @Mapper(unmappedTargetPolicy = org.mapstruct.ReportingPolicy.IGNORE,
         componentModel = "spring")
 public interface ServiceRequestMapper {
-    ServiceRequestResponse ToServiceRequestResponse(ServiceRequest source);
+    ServiceRequestResponse toServiceRequestResponse(ServiceRequest source);
 
-    ServiceRequest ToServiceRequest(CreateServiceRequest source);
+    ServiceRequest toServiceRequest(CreateServiceRequest source);
 
 }

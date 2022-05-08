@@ -30,11 +30,10 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
 
     private final ServiceRequestRepository serviceRequestRepository;
     private final CustomerRepository customerRepository;
-    private final ServiceRequestMapper serviceRequestMapper;
     private final VehicleRepository vehicleRepository;
+    private final ServiceRequestMapper serviceRequestMapper;
 
     @Override
-
     public List<ServiceRequestResponse> findSR(final Optional<Long> customerId, final Optional<Long> vehicleId) {
         if (customerId.isEmpty() && vehicleId.isEmpty()) {
             log.error("vehicleId:{} and customerId:{} is empty", vehicleId, customerId);
@@ -54,13 +53,13 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
         final Customer customer = customerRepository
                 .findById(customerId)
                 .orElseThrow(() -> {
-                    log.error("Customer not found for customerid:{}", customerId);
+                    log.error("Customer not found for customerId:{}", customerId);
                     throw new NotFoundException("Customer with id: " + customerId + " not found", HttpStatus.NOT_FOUND.name());
                 });
         return serviceRequestRepository
                 .findServiceRequestByCustomer(customer)
                 .stream()
-                .map(serviceRequestMapper::ToServiceRequestResponse)
+                .map(serviceRequestMapper::toServiceRequestResponse)
                 .collect(Collectors.toList());
     }
 
@@ -74,7 +73,7 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
         return serviceRequestRepository
                 .findServiceRequestsByVehicle(vehicle)
                 .stream()
-                .map(serviceRequestMapper::ToServiceRequestResponse)
+                .map(serviceRequestMapper::toServiceRequestResponse)
                 .collect(Collectors.toList());
     }
 
@@ -93,7 +92,7 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
                     log.error("Vehicle not found for id:{}\nrequest:{}", vehicleId, request);
                     throw new NotFoundException("Vehicle with id: " + vehicleId + " not found", HttpStatus.NOT_FOUND.name());
                 });
-        final ServiceRequest serviceRequest = serviceRequestMapper.ToServiceRequest(request);
+        final ServiceRequest serviceRequest = serviceRequestMapper.toServiceRequest(request);
         vehicle.addCustomer(customer);
         serviceRequest.setCustomer(customer);
         serviceRequest.setVehicle(vehicle);

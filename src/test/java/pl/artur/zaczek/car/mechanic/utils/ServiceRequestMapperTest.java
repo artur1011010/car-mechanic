@@ -41,7 +41,7 @@ class ServiceRequestMapperTest {
                 .finishTime(LocalDateTime.of(2022, 4, 9, 12, 20))
                 .build();
         //when
-        final ServiceRequestResponse actualResponse = serviceRequestMapper.ToServiceRequestResponse(input);
+        final ServiceRequestResponse actualResponse = serviceRequestMapper.toServiceRequestResponse(input);
         //then
         assertEquals(expectedResponse, actualResponse);
     }

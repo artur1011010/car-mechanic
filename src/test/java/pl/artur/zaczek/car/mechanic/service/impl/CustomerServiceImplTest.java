@@ -4,10 +4,14 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.artur.zaczek.car.mechanic.jpa.AddressRepository;
 import pl.artur.zaczek.car.mechanic.jpa.CustomerRepository;
@@ -16,6 +20,7 @@ import pl.artur.zaczek.car.mechanic.model.ServiceRequest;
 import pl.artur.zaczek.car.mechanic.model.Vehicle;
 import pl.artur.zaczek.car.mechanic.rest.error.BadRequestException;
 import pl.artur.zaczek.car.mechanic.rest.error.NotFoundException;
+import pl.artur.zaczek.car.mechanic.rest.model.AddressDTO;
 import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomer;
 import pl.artur.zaczek.car.mechanic.rest.model.CustomerResponse;
 import pl.artur.zaczek.car.mechanic.utils.CustomerMapper;
@@ -94,7 +99,7 @@ class CustomerServiceImplTest {
                 .companyName("Comp name")
                 .build();
         assertThrows(BadRequestException.class,
-                () -> customerService.createUser(request));
+                () -> customerService.createCustomer(request));
     }
 
     @Test
@@ -105,7 +110,7 @@ class CustomerServiceImplTest {
                 .companyNip("59949343")
                 .build();
         assertThrows(BadRequestException.class,
-                () -> customerService.createUser(request));
+                () -> customerService.createCustomer(request));
     }
 
     @Test
@@ -115,7 +120,7 @@ class CustomerServiceImplTest {
                 .isCompany(true)
                 .build();
         assertThrows(BadRequestException.class,
-                () -> customerService.createUser(request));
+                () -> customerService.createCustomer(request));
     }
 
     @Test
@@ -145,5 +150,63 @@ class CustomerServiceImplTest {
         final CustomerResponse actualResponse = customerService.getCustomerById(1L);
         //then
         assertEquals(expectedResponse, actualResponse);
+    }
+
+    /***********  create customer  ***********/
+
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"  ", "\t", "\n"})
+    @DisplayName("should throw BadRequestException when is company and nip is empty or blank")
+    public void shouldThrowBadRequestExceptionWhenIsCompanyAndNipIsEmptyOrBlank(String input) {
+        //given
+        final CreateCustomer customer = CreateCustomer.builder()
+                .email("abc@mail.com")
+                .name("abc")
+                .isCompany(true)
+                .companyName(input)
+                .phoneNo("1515155")
+                .address(AddressDTO.builder()
+                        .city("Warsaw")
+                        .flatNo(7)
+                        .streetNo(44)
+                        .street("Ordynacka")
+                        .build())
+                .build();
+        //then
+        final BadRequestException exception = assertThrows(BadRequestException.class, () -> customerService.createCustomer(customer));
+        assertEquals(HttpStatus.BAD_REQUEST.toString(), exception.getCode());
+        assertEquals("Customer type company requires companyNip and companyName", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should throw BadRequestException when customer request is null")
+    public void shouldCreateCustomer() {
+        final BadRequestException exception = assertThrows(BadRequestException.class, () -> customerService.createCustomer(null));
+        assertEquals(HttpStatus.BAD_REQUEST.toString(), exception.getCode());
+        assertEquals("Customer request can not be null", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should create new customer")
+    public void shouldCreateNewCustomer() {
+        //given
+        final CreateCustomer customer = CreateCustomer.builder()
+                .email("abc@mail.com")
+                .name("abc")
+                .isCompany(false)
+                .phoneNo("1515155")
+                .address(AddressDTO.builder()
+                        .city("Warsaw")
+                        .flatNo(7)
+                        .streetNo(44)
+                        .street("Ordynacka")
+                        .build())
+                .build();
+        //when
+        Mockito.when(customerRepository.save(Mockito.any())).thenReturn(Customer.builder().id(1L).build());
+        //then
+        final Long actualResponse = customerService.createCustomer(customer);
+        assertEquals(1L, actualResponse);
     }
 }

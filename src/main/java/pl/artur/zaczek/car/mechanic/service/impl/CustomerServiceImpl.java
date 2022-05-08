@@ -2,6 +2,7 @@ package pl.artur.zaczek.car.mechanic.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import pl.artur.zaczek.car.mechanic.jpa.AddressRepository;
@@ -36,7 +37,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Long createUser(final CreateCustomer customerRequest) {
+    public Long createCustomer(final CreateCustomer customerRequest) {
         validateCreateCustomerRequest(customerRequest);
         final Customer customer = customerMapper.createCustomerRequestToCustomerMapper(customerRequest);
         customer.setVehicleSet(new HashSet<>());
@@ -60,7 +61,7 @@ public class CustomerServiceImpl implements CustomerService {
             log.error("Customer request can not be null");
             throw new BadRequestException("Customer request can not be null", HttpStatus.BAD_REQUEST.toString());
         }
-        if (customerRequest.isCompany() || customerRequest.getCompanyNip() == null || customerRequest.getCompanyName() == null) {
+        if (customerRequest.isCompany() && (StringUtils.isBlank(customerRequest.getCompanyNip()) || StringUtils.isBlank(customerRequest.getCompanyName()))) {
             log.error("Customer type company requires companyNip and companyName: {}", customerRequest);
             throw new BadRequestException("Customer type company requires companyNip and companyName", HttpStatus.BAD_REQUEST.toString());
         }

@@ -11,7 +11,6 @@ import pl.artur.zaczek.car.mechanic.jpa.VehicleRepository;
 import pl.artur.zaczek.car.mechanic.model.Customer;
 import pl.artur.zaczek.car.mechanic.model.ServiceRequest;
 import pl.artur.zaczek.car.mechanic.model.Vehicle;
-import pl.artur.zaczek.car.mechanic.rest.error.BadRequestException;
 import pl.artur.zaczek.car.mechanic.rest.error.NotFoundException;
 import pl.artur.zaczek.car.mechanic.rest.error.NotImplementedException;
 import pl.artur.zaczek.car.mechanic.rest.model.CreateServiceRequest;
@@ -36,8 +35,9 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
     @Override
     public List<ServiceRequestResponse> findSR(final Optional<Long> customerId, final Optional<Long> vehicleId) {
         if (customerId.isEmpty() && vehicleId.isEmpty()) {
-            log.error("vehicleId:{} and customerId:{} is empty", vehicleId, customerId);
-            throw new BadRequestException("VehicleId and customerId is empty", HttpStatus.BAD_REQUEST.name());
+          return serviceRequestRepository.findAll().stream()
+                  .map(serviceRequestMapper::toServiceRequestResponse)
+                  .collect(Collectors.toList());
         } else if (vehicleId.isPresent() && customerId.isEmpty()) {
             return findSRByVehicleId(vehicleId.get());
         } else if (customerId.isPresent() && vehicleId.isEmpty()) {

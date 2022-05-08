@@ -68,6 +68,6 @@ public class CustomerController {
             @ApiResponse(code = 500, message = "Internal server error", response = ApiErrorResponse.class)})
     public ResponseEntity<Long> createCustomer(@RequestBody @Valid final CreateCustomer customerRequest) {
         log.info("POST api/customer with requestBody=\n{}", customerRequest);
-        return ResponseEntity.ok(customerService.createUser(customerRequest));
+        return ResponseEntity.ok(customerService.createCustomer(customerRequest));
     }
 }

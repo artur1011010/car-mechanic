@@ -8,6 +8,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.artur.zaczek.car.mechanic.jpa.CustomerRepository;
 import pl.artur.zaczek.car.mechanic.jpa.ServiceRequestRepository;
@@ -145,12 +146,6 @@ class ServiceRequestServiceImplTest {
                 .isDone(false)
                 .title("Test")
                 .build();
-        final ServiceRequest serviceRequest = ServiceRequest.builder()
-                .id(1L)
-                .comment("test")
-                .isDone(false)
-                .title("Test")
-                .build();
         //when
         Mockito.when(vehicleRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(Vehicle.builder().build()));
         Mockito.when(customerRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(Customer.builder().build()));
@@ -174,5 +169,43 @@ class ServiceRequestServiceImplTest {
         //then
         assertEquals(1L, serviceRequestService1.createSR(createServiceRequest, 1L, 1L));
     }
+
+    @Test
+    @DisplayName("should throw NotFoundException when customer is not found")
+    public void shouldThrowNotFoundExceptionWhenCustomerIsNotFound() {
+        //given
+        final CreateServiceRequest createServiceRequest = CreateServiceRequest.builder()
+                .comment("test")
+                .isDone(false)
+                .title("Test")
+                .build();
+        //when
+        Mockito.when(vehicleRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(Vehicle.builder().build()));
+        Mockito.when(customerRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        final NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> serviceRequestService.createSR(createServiceRequest, 1L, 1L));
+        assertEquals(HttpStatus.NOT_FOUND.name(), exception.getCode());
+        assertEquals("Customer with id: 1 not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should throw NotFoundException when vehicle is not found")
+    public void shouldThrowNotFoundExceptionWhenVehicleIsNotFound() {
+        //given
+        final CreateServiceRequest createServiceRequest = CreateServiceRequest.builder()
+                .comment("test")
+                .isDone(false)
+                .title("Test")
+                .build();
+
+        //when
+        Mockito.when(vehicleRepository.findById(Mockito.anyLong())).thenReturn(Optional.empty());
+        Mockito.when(customerRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(Customer.builder().build()));
+        final NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> serviceRequestService.createSR(createServiceRequest, 1L, 1L));
+        assertEquals(HttpStatus.NOT_FOUND.name(), exception.getCode());
+        assertEquals("Vehicle with id: 1 not found", exception.getMessage());
+    }
+
 
 }

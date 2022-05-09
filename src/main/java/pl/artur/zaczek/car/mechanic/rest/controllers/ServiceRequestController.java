@@ -44,6 +44,22 @@ public class ServiceRequestController {
     }
 
     @RequestMapping(
+            method = RequestMethod.GET,
+            value = "/service-request/{id}",
+            produces = "application/json; charset=UTF-8")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "Return service requests with specific id")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK", response = ServiceRequestResponse[].class),
+            @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+            @ApiResponse(code = 404, message = "Not found", response = ApiErrorResponse.class)})
+    public ResponseEntity<ServiceRequestResponse> getSRById(@PathVariable final Long id) {
+        log.info("GET api/service-request/{}", id);
+        return ResponseEntity.ok(serviceRequestService.getSRById(id));
+    }
+
+
+    @RequestMapping(
             method = RequestMethod.POST,
             value = "/service-request",
             consumes = "application/json; charset=UTF-8",

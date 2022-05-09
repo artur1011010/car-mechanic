@@ -11,4 +11,5 @@ public interface ServiceRequestService {
     List<ServiceRequestResponse> findSRByVehicleId(Long vehicleId);
     List<ServiceRequestResponse> findSR(Optional<Long> vehicleId, Optional<Long> customerId);
     Long createSR(CreateServiceRequest request, Long customerId, Long vehicleId);
+    ServiceRequestResponse getSRById(Long id);
 }

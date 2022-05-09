@@ -35,9 +35,9 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
     @Override
     public List<ServiceRequestResponse> findSR(final Optional<Long> customerId, final Optional<Long> vehicleId) {
         if (customerId.isEmpty() && vehicleId.isEmpty()) {
-          return serviceRequestRepository.findAll().stream()
-                  .map(serviceRequestMapper::toServiceRequestResponse)
-                  .collect(Collectors.toList());
+            return serviceRequestRepository.findAll().stream()
+                    .map(serviceRequestMapper::toServiceRequestResponse)
+                    .collect(Collectors.toList());
         } else if (vehicleId.isPresent() && customerId.isEmpty()) {
             return findSRByVehicleId(vehicleId.get());
         } else if (customerId.isPresent() && vehicleId.isEmpty()) {
@@ -75,6 +75,17 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
                 .stream()
                 .map(serviceRequestMapper::toServiceRequestResponse)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public ServiceRequestResponse getSRById(Long id) {
+        return serviceRequestRepository
+                .findById(id)
+                .map(serviceRequestMapper::toServiceRequestResponse)
+                .orElseThrow(() -> {
+                    log.error("Service request not found with id:{}", id);
+                    throw new NotFoundException("Service request id: " + id + " not found", HttpStatus.NOT_FOUND.name());
+                });
     }
 
     @Override

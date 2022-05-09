@@ -205,4 +205,38 @@ class ServiceRequestServiceImplTest {
         assertEquals(HttpStatus.NOT_FOUND.name(), exception.getCode());
         assertEquals("Vehicle with id: 1 not found", exception.getMessage());
     }
+
+    @Test
+    @DisplayName("should throw NotFoundException when Service request is not found")
+    public void shouldThrowNotFoundExceptionWhenSRIsNotFound() {
+        //when
+        final NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> serviceRequestService.getSRById(1L));
+        assertEquals(HttpStatus.NOT_FOUND.name(), exception.getCode());
+        assertEquals("Service request id: 1 not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should return response when SR is found on DB")
+    public void shouldReturnResponseWhenSRIsFoundOnDB() {
+        //given
+        final ServiceRequest serviceRequest = ServiceRequest.builder()
+                .id(1L)
+                .comment("test")
+                .isDone(false)
+                .title("Test")
+                .build();
+
+        final ServiceRequestResponse expectedResponse = ServiceRequestResponse.builder()
+                .id(1L)
+                .comment("test")
+                .isDone(false)
+                .title("Test")
+                .build();
+        //when
+        Mockito.when(serviceRequestRepository.findById(1L)).thenReturn(Optional.of(serviceRequest));
+        final ServiceRequestResponse actualResponse = serviceRequestService.getSRById(1L);
+        //then
+        assertEquals(expectedResponse, actualResponse);
+    }
 }

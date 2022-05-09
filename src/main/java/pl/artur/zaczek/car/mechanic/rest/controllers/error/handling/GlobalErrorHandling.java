@@ -24,17 +24,17 @@ public class GlobalErrorHandling extends ResponseEntityExceptionHandler {
     }
 
     @ExceptionHandler(value = NotFoundException.class)
-    protected ResponseEntity<Object> handleNotFoundException(BaseApiError ex) {
+    protected ResponseEntity<ApiErrorResponse> handleNotFoundException(BaseApiError ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(createErrorMessage(ex));
     }
 
     @ExceptionHandler(value = BadRequestException.class)
-    protected ResponseEntity<Object> handleBadRequestException(BaseApiError ex) {
+    protected ResponseEntity<ApiErrorResponse> handleBadRequestException(BaseApiError ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(createErrorMessage(ex));
     }
 
     @ExceptionHandler(value = NotImplementedException.class)
-    protected ResponseEntity<Object> handleNotImplementedException(BaseApiError ex) {
+    protected ResponseEntity<ApiErrorResponse> handleNotImplementedException(BaseApiError ex) {
         return ResponseEntity.status(HttpStatus.NOT_IMPLEMENTED).body(createErrorMessage(ex));
     }
 
@@ -42,7 +42,7 @@ public class GlobalErrorHandling extends ResponseEntityExceptionHandler {
         return ApiErrorResponse.builder()
                 .message(ex.getMessage())
                 .code(ex.getCode())
-//                .details(ex.getDetails())
+                .details(ex.getDetails())
                 .build();
     }
 }

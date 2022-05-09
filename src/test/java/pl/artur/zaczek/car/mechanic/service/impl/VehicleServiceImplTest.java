@@ -8,21 +8,21 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpStatus;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import pl.artur.zaczek.car.mechanic.jpa.CustomerRepository;
 import pl.artur.zaczek.car.mechanic.jpa.VehicleRepository;
 import pl.artur.zaczek.car.mechanic.model.BodyType;
+import pl.artur.zaczek.car.mechanic.model.Customer;
 import pl.artur.zaczek.car.mechanic.model.Engine;
 import pl.artur.zaczek.car.mechanic.model.Vehicle;
 import pl.artur.zaczek.car.mechanic.rest.error.NotFoundException;
+import pl.artur.zaczek.car.mechanic.rest.model.CreateVehicle;
 import pl.artur.zaczek.car.mechanic.rest.model.EngineResponse;
 import pl.artur.zaczek.car.mechanic.rest.model.VehicleResponse;
 import pl.artur.zaczek.car.mechanic.utils.VehicleMapper;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -82,6 +82,56 @@ class VehicleServiceImplTest {
     }
 
     @Test
+    @DisplayName("should return correct response when customerId is present")
+    public void shouldReturnCorrectResponseWhenCustomerIdIsPresent() {
+        //given
+        final Vehicle vehicle = Vehicle.builder()
+                .bodyType(BodyType.COMBI)
+                .id(1L)
+                .color("RED")
+                .brand("Mercedes")
+                .engine(Engine.builder()
+                        .id(12L)
+                        .power(150.0)
+                        .capacity(1500.2)
+                        .build())
+                .build();
+
+        final VehicleResponse expectedResponse = VehicleResponse.builder()
+                .bodyType(BodyType.COMBI)
+                .id(1L)
+                .color("RED")
+                .brand("Mercedes")
+                .engine(EngineResponse.builder()
+                        .id(12L)
+                        .power(150.0)
+                        .capacity(1500.2)
+                        .build())
+                .build();
+        //when
+        Mockito.when(vehicleRepository.findAll()).thenReturn(List.of(vehicle));
+        Mockito.when(customerRepository.findById(123L)).thenReturn(Optional.of(Customer
+                .builder()
+                .vehicleSet(Set.of(vehicle))
+                .build()));
+        final List<VehicleResponse> actualResponse = vehicleService.getVehicles(Optional.of(123L));
+        //then
+        assertEquals(List.of(expectedResponse), actualResponse);
+    }
+
+    @Test
+    @DisplayName("should throw NotFoundException when CustomerId is not found")
+    public void shouldThrowNotFoundExceptionWhenCustomerIdIsNotFound() {
+        //when
+        Mockito.when(customerRepository.findById(123L)).thenReturn(Optional.empty());
+        //then
+        final NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> vehicleService.getVehicles(Optional.of(123L)));
+        assertEquals(HttpStatus.NOT_FOUND.name(), exception.getCode());
+        assertEquals("Customer with id: 123 not found", exception.getMessage());
+    }
+
+    @Test
     @DisplayName("should return empty array")
     public void shouldReturnEmptyArray() {
         //when
@@ -129,5 +179,41 @@ class VehicleServiceImplTest {
         Mockito.when(vehicleRepository.findById(1L)).thenReturn(Optional.empty());
         assertThrows(NotFoundException.class,
                 () -> vehicleService.getVehicleById(1L));
+    }
+
+    /***********  create vehicle  ***********/
+
+    @Test
+    @DisplayName("should throw NotFoundException when customer is not found")
+    public void shouldThrowNotFoundExceptionWhenCustomerIsNotFound() {
+        //given
+        final CreateVehicle request = CreateVehicle.builder()
+                .brand("test")
+                .color("red")
+                .vin("12133")
+                .build();
+        //when
+        Mockito.when(customerRepository.findById(123L)).thenReturn(Optional.empty());
+        final NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> vehicleService.createVehicle(request, 123L));
+        assertEquals(HttpStatus.NOT_FOUND.name(), exception.getCode());
+        assertEquals("Customer with id: 123 not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should create new vehicle")
+    public void shouldCreateNewVehicle() {
+        //given
+        final CreateVehicle request = CreateVehicle.builder()
+                .brand("test")
+                .color("red")
+                .vin("12133")
+                .build();
+        //when
+        Mockito.when(customerRepository.findById(123L)).thenReturn(Optional.of(Customer.builder().vehicleSet(new HashSet<>()).build()));
+        Mockito.when(vehicleRepository.save(Mockito.any())).thenReturn(Vehicle.builder().id(1L).build());
+        //then
+        final Long actualResponse = vehicleService.createVehicle(request, 123L);
+        assertEquals(1L, actualResponse);
     }
 }

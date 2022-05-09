@@ -32,7 +32,6 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 @SpringBootTest
 class ServiceRequestServiceImplTest {
 
-
     @Autowired
     ServiceRequestMapper serviceRequestMapper;
 
@@ -206,6 +205,4 @@ class ServiceRequestServiceImplTest {
         assertEquals(HttpStatus.NOT_FOUND.name(), exception.getCode());
         assertEquals("Vehicle with id: 1 not found", exception.getMessage());
     }
-
-
 }

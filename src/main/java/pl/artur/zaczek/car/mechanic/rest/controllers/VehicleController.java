@@ -10,6 +10,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pl.artur.zaczek.car.mechanic.rest.error.ApiErrorResponse;
 import pl.artur.zaczek.car.mechanic.rest.model.CreateVehicle;
+import pl.artur.zaczek.car.mechanic.rest.model.SetVehicle;
 import pl.artur.zaczek.car.mechanic.rest.model.VehicleResponse;
 import pl.artur.zaczek.car.mechanic.service.VehicleService;
 
@@ -71,6 +72,24 @@ public class VehicleController {
     public ResponseEntity<Long> createVehicle(@RequestBody @Valid final CreateVehicle request, @RequestParam final Long customerId) {
         log.info("POST api/vehicle with body: {} \ncustomerId: {}", request, customerId);
         return ResponseEntity.ok(vehicleService.createVehicle(request, customerId));
+    }
+
+    @RequestMapping(
+            method = RequestMethod.PUT,
+            value = "/vehicle",
+            consumes = "application/json; charset=UTF-8")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "Set vehicle ",
+            notes = "Edit existing vehicle based on id")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK - Vehicle successfully set:"),
+            @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+            @ApiResponse(code = 404, message = "Not Found", response = ApiErrorResponse.class),
+            @ApiResponse(code = 500, message = "Internal server error", response = ApiErrorResponse.class)})
+    public ResponseEntity<Void> setVehicle(@RequestBody @Valid final SetVehicle request) {
+        log.info("PUT api/vehicle with body: {}", request);
+        vehicleService.setVehicle(request);
+        return ResponseEntity.ok().build();
     }
 
 }

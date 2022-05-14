@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.artur.zaczek.car.mechanic.rest.error.ApiErrorResponse;
 import pl.artur.zaczek.car.mechanic.rest.model.CreateServiceRequest;
 import pl.artur.zaczek.car.mechanic.rest.model.ServiceRequestResponse;
+import pl.artur.zaczek.car.mechanic.rest.model.SetServiceRequest;
 import pl.artur.zaczek.car.mechanic.service.ServiceRequestService;
 
 import javax.validation.Valid;
@@ -68,13 +69,31 @@ public class ServiceRequestController {
     @ApiOperation(value = "Create new Service Request for specific customerId and vehicleId",
             notes = "Service creates new Service Request, takes body: CreateServiceRequest and 2 query params: userId and vehicleId")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK", response = Long.class),
+            @ApiResponse(code = 200, message = "OK - Service request successfully created with id:", response = Long.class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
             @ApiResponse(code = 404, message = "Not found", response = ApiErrorResponse.class),
             @ApiResponse(code = 500, message = "Internal server error", response = ApiErrorResponse.class)})
     public ResponseEntity<Long> saveNewServiceRequest(@RequestBody @Valid final CreateServiceRequest request, @RequestParam final Long customerId, @RequestParam final Long vehicleId) {
         log.info("POST api/service-request with body={}\ncustomerId={}\nvehicleId={}", request, customerId, vehicleId);
         return ResponseEntity.ok(serviceRequestService.createSR(request, customerId, vehicleId));
+    }
+
+    @RequestMapping(
+            method = RequestMethod.PUT,
+            value = "/service-request",
+            consumes = "application/json; charset=UTF-8")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "Set Service Request",
+            notes = "Edit existing service request based on id")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK - Service request successfully edited"),
+            @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+            @ApiResponse(code = 404, message = "Not found", response = ApiErrorResponse.class),
+            @ApiResponse(code = 500, message = "Internal server error", response = ApiErrorResponse.class)})
+    public ResponseEntity<Void> setServiceRequest(@RequestBody @Valid final SetServiceRequest request) {
+        log.info("PUT api/service-request with body={}", request);
+        serviceRequestService.setSR(request);
+        return ResponseEntity.ok().build();
     }
 
 }

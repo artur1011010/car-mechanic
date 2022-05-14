@@ -19,14 +19,15 @@ import pl.artur.zaczek.car.mechanic.model.Vehicle;
 import pl.artur.zaczek.car.mechanic.rest.error.NotFoundException;
 import pl.artur.zaczek.car.mechanic.rest.model.CreateServiceRequest;
 import pl.artur.zaczek.car.mechanic.rest.model.ServiceRequestResponse;
+import pl.artur.zaczek.car.mechanic.rest.model.SetServiceRequest;
 import pl.artur.zaczek.car.mechanic.utils.ServiceRequestMapper;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -49,7 +50,7 @@ class ServiceRequestServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        serviceRequestService = new ServiceRequestServiceImpl(serviceRequestRepository ,customerRepository,vehicleRepository, serviceRequestMapper);
+        serviceRequestService = new ServiceRequestServiceImpl(serviceRequestRepository, customerRepository, vehicleRepository, serviceRequestMapper);
     }
 
     @Test
@@ -67,6 +68,10 @@ class ServiceRequestServiceImplTest {
         final ServiceRequest serviceRequest = ServiceRequest.builder()
                 .id(1L)
                 .comment("test")
+                .createdTime(LocalDateTime.of(2022, 12, 30, 12, 40))
+                .modifiedTime(LocalDateTime.of(2022, 12, 30, 12, 40))
+                .createdUser("API_USER")
+                .modifiedUser("API_USER")
                 .isDone(false)
                 .title("Test")
                 .build();
@@ -74,6 +79,10 @@ class ServiceRequestServiceImplTest {
         final ServiceRequestResponse expectedResponse = ServiceRequestResponse.builder()
                 .id(1L)
                 .comment("test")
+                .createdTime(LocalDateTime.of(2022, 12, 30, 12, 40))
+                .modifiedTime(LocalDateTime.of(2022, 12, 30, 12, 40))
+                .createdUser("API_USER")
+                .modifiedUser("API_USER")
                 .isDone(false)
                 .title("Test")
                 .build();
@@ -136,6 +145,43 @@ class ServiceRequestServiceImplTest {
         assertEquals(new ArrayList<>(), serviceRequestService.findSRByVehicleId(1L));
     }
 
+
+    @Test
+    @DisplayName("should throw NotFoundException when Service request is not found")
+    public void shouldThrowNotFoundExceptionWhenSRIsNotFound() {
+        //when
+        final NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> serviceRequestService.getSRById(1L));
+        assertEquals(HttpStatus.NOT_FOUND.name(), exception.getCode());
+        assertEquals("Service request id: 1 not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should return response when SR is found on DB")
+    public void shouldReturnResponseWhenSRIsFoundOnDB() {
+        //given
+        final ServiceRequest serviceRequest = ServiceRequest.builder()
+                .id(1L)
+                .comment("test")
+                .isDone(false)
+                .title("Test")
+                .build();
+
+        final ServiceRequestResponse expectedResponse = ServiceRequestResponse.builder()
+                .id(1L)
+                .comment("test")
+                .isDone(false)
+                .title("Test")
+                .build();
+        //when
+        Mockito.when(serviceRequestRepository.findById(1L)).thenReturn(Optional.of(serviceRequest));
+        final ServiceRequestResponse actualResponse = serviceRequestService.getSRById(1L);
+        //then
+        assertEquals(expectedResponse, actualResponse);
+    }
+
+    /***********  create service request  ***********/
+
     @Test
     @DisplayName("should save new SR on DB")
     public void shouldSaveNewSRonDB() {
@@ -164,7 +210,7 @@ class ServiceRequestServiceImplTest {
                         .build();
             }
         };
-        ServiceRequestServiceImpl serviceRequestService1 = new ServiceRequestServiceImpl(serviceRequestRepository ,customerRepository,vehicleRepository, serviceRequestMapper1);
+        ServiceRequestServiceImpl serviceRequestService1 = new ServiceRequestServiceImpl(serviceRequestRepository, customerRepository, vehicleRepository, serviceRequestMapper1);
         //then
         assertEquals(1L, serviceRequestService1.createSR(createServiceRequest, 1L, 1L));
     }
@@ -206,37 +252,21 @@ class ServiceRequestServiceImplTest {
         assertEquals("Vehicle with id: 1 not found", exception.getMessage());
     }
 
-    @Test
-    @DisplayName("should throw NotFoundException when Service request is not found")
-    public void shouldThrowNotFoundExceptionWhenSRIsNotFound() {
-        //when
-        final NotFoundException exception = assertThrows(NotFoundException.class,
-                () -> serviceRequestService.getSRById(1L));
-        assertEquals(HttpStatus.NOT_FOUND.name(), exception.getCode());
-        assertEquals("Service request id: 1 not found", exception.getMessage());
-    }
+    /***********  set service request  ***********/
 
     @Test
-    @DisplayName("should return response when SR is found on DB")
-    public void shouldReturnResponseWhenSRIsFoundOnDB() {
+    @DisplayName("should set SR on DB")
+    public void shouldSetSRonDB() {
         //given
-        final ServiceRequest serviceRequest = ServiceRequest.builder()
-                .id(1L)
-                .comment("test")
-                .isDone(false)
-                .title("Test")
-                .build();
-
-        final ServiceRequestResponse expectedResponse = ServiceRequestResponse.builder()
+        final SetServiceRequest request = SetServiceRequest.builder()
                 .id(1L)
                 .comment("test")
                 .isDone(false)
                 .title("Test")
                 .build();
         //when
-        Mockito.when(serviceRequestRepository.findById(1L)).thenReturn(Optional.of(serviceRequest));
-        final ServiceRequestResponse actualResponse = serviceRequestService.getSRById(1L);
+        Mockito.when(serviceRequestRepository.findById(Mockito.anyLong())).thenReturn(Optional.of(ServiceRequest.builder().build()));
         //then
-        assertEquals(expectedResponse, actualResponse);
+        assertDoesNotThrow(() -> serviceRequestService.setSR(request));
     }
 }

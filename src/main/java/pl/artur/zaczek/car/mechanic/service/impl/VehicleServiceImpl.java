@@ -11,6 +11,7 @@ import pl.artur.zaczek.car.mechanic.model.Customer;
 import pl.artur.zaczek.car.mechanic.model.Vehicle;
 import pl.artur.zaczek.car.mechanic.rest.error.NotFoundException;
 import pl.artur.zaczek.car.mechanic.rest.model.CreateVehicle;
+import pl.artur.zaczek.car.mechanic.rest.model.SetVehicle;
 import pl.artur.zaczek.car.mechanic.rest.model.VehicleResponse;
 import pl.artur.zaczek.car.mechanic.service.VehicleService;
 import pl.artur.zaczek.car.mechanic.utils.VehicleMapper;
@@ -69,5 +70,29 @@ public class VehicleServiceImpl implements VehicleService {
         final long id = vehicleRepository.save(vehicle).getId();
         customerRepository.save(customer);
         return id;
+    }
+
+    @Override
+    @Transactional
+    public void setVehicle(final SetVehicle request) {
+        final long vehicleId = request.getId();
+        final Vehicle vehicle = vehicleRepository.findById(vehicleId)
+                .orElseThrow(() -> {
+                    log.error("Vehicle not found with id:{}", vehicleId);
+                    throw new NotFoundException("Vehicle with id: " + vehicleId + " not found", HttpStatus.NOT_FOUND.name());
+                });
+        vehicle.setVin(request.getVin());
+        vehicle.setLicensePlate(request.getLicensePlate());
+        vehicle.setFirstRegistrationDate(request.getFirstRegistrationDate());
+        vehicle.setProdYear(request.getProdYear());
+        vehicle.setBrand(request.getBrand());
+        vehicle.setModel(request.getModel());
+        vehicle.setBodyType(request.getBodyType());
+        vehicle.setMileage(request.getMileage());
+        vehicle.setColor(request.getColor());
+        if (request.getEngine() != null) {
+            vehicle.setEngine(vehicleMapper.engineDTOToEngine(request.getEngine()));
+        }
+        vehicleRepository.save(vehicle);
     }
 }

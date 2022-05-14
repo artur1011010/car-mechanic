@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import pl.artur.zaczek.car.mechanic.rest.error.ApiErrorResponse;
 import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomer;
 import pl.artur.zaczek.car.mechanic.rest.model.CustomerResponse;
+import pl.artur.zaczek.car.mechanic.rest.model.SetCustomer;
 import pl.artur.zaczek.car.mechanic.service.CustomerService;
 
 import javax.validation.Valid;
@@ -63,11 +64,29 @@ public class CustomerController {
     @ApiOperation(value = "Create customer",
             notes = "Creates a new customer and return created id")
     @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "OK - User successfully created with id:", response = Long.class),
+            @ApiResponse(code = 200, message = "OK - Customer successfully created with id:", response = Long.class),
             @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
             @ApiResponse(code = 500, message = "Internal server error", response = ApiErrorResponse.class)})
     public ResponseEntity<Long> createCustomer(@RequestBody @Valid final CreateCustomer customerRequest) {
         log.info("POST api/customer with requestBody=\n{}", customerRequest);
         return ResponseEntity.ok(customerService.createCustomer(customerRequest));
+    }
+
+    @RequestMapping(
+            method = RequestMethod.PUT,
+            value = "/customer",
+            consumes = "application/json; charset=UTF-8")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiOperation(value = "Set customer",
+            notes = "Edit existing customer based on id")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "OK - Customer successfully edited"),
+            @ApiResponse(code = 400, message = "Bad Request", response = ApiErrorResponse.class),
+            @ApiResponse(code = 404, message = "Not found", response = ApiErrorResponse.class),
+            @ApiResponse(code = 500, message = "Internal server error", response = ApiErrorResponse.class)})
+    public ResponseEntity<Void> setCustomer(@RequestBody @Valid final SetCustomer customerRequest) {
+        log.info("PUT api/customer with requestBody=\n{}", customerRequest);
+        customerService.setCustomer(customerRequest);
+        return ResponseEntity.ok().build();
     }
 }

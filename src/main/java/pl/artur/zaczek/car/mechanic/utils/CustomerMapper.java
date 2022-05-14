@@ -1,7 +1,9 @@
 package pl.artur.zaczek.car.mechanic.utils;
 
 import org.mapstruct.Mapper;
+import pl.artur.zaczek.car.mechanic.model.Address;
 import pl.artur.zaczek.car.mechanic.model.Customer;
+import pl.artur.zaczek.car.mechanic.rest.model.AddressDTO;
 import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomer;
 import pl.artur.zaczek.car.mechanic.rest.model.CustomerResponse;
 
@@ -11,4 +13,8 @@ public interface CustomerMapper {
     CustomerResponse customerToResponse(Customer source);
 
     Customer createCustomerRequestToCustomerMapper(CreateCustomer source);
+
+    AddressDTO addressToAddressDTO(Address source);
+
+    Address addressDTOToAddress(AddressDTO source);
 }

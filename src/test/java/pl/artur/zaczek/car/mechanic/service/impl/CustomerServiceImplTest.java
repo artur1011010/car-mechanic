@@ -23,7 +23,9 @@ import pl.artur.zaczek.car.mechanic.rest.error.NotFoundException;
 import pl.artur.zaczek.car.mechanic.rest.model.AddressDTO;
 import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomer;
 import pl.artur.zaczek.car.mechanic.rest.model.CustomerResponse;
+import pl.artur.zaczek.car.mechanic.rest.model.SetCustomer;
 import pl.artur.zaczek.car.mechanic.utils.CustomerMapper;
+import pl.artur.zaczek.car.mechanic.utils.ModelValidator;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -39,6 +41,9 @@ class CustomerServiceImplTest {
     @Autowired
     CustomerMapper customerMapper;
 
+    @Autowired
+    ModelValidator modelValidator;
+
     @Mock
     CustomerRepository customerRepository;
 
@@ -49,8 +54,10 @@ class CustomerServiceImplTest {
 
     @BeforeEach
     void setUp() {
-        customerService = new CustomerServiceImpl(customerRepository, addressRepository, customerMapper);
+        customerService = new CustomerServiceImpl(customerRepository, addressRepository, customerMapper, modelValidator);
     }
+
+    /***********  get customer  ***********/
 
     @Test
     @DisplayName("should return empty list")
@@ -157,8 +164,8 @@ class CustomerServiceImplTest {
     @ParameterizedTest
     @NullAndEmptySource
     @ValueSource(strings = {"  ", "\t", "\n"})
-    @DisplayName("should throw BadRequestException when is company and nip is empty or blank")
-    public void shouldThrowBadRequestExceptionWhenIsCompanyAndNipIsEmptyOrBlank(String input) {
+    @DisplayName("should throw BadRequestException when is company and nip is empty or blank in CreateCustomer")
+    public void shouldThrowBadRequestExceptionWhenIsCompanyAndNipIsEmptyOrBlankInCreateCustomer(String input) {
         //given
         final CreateCustomer customer = CreateCustomer.builder()
                 .email("abc@mail.com")
@@ -208,5 +215,63 @@ class CustomerServiceImplTest {
         //then
         final Long actualResponse = customerService.createCustomer(customer);
         assertEquals(1L, actualResponse);
+    }
+
+    /***********  set customer  ***********/
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {"  ", "\t", "\n"})
+    @DisplayName("should throw BadRequestException when is company and nip is empty or blank in SetCustomer")
+    public void shouldThrowBadRequestExceptionWhenIsCompanyAndNipIsEmptyOrBlankInSetCustomer(String input) {
+        //given
+        final SetCustomer customer = SetCustomer.builder()
+                .email("abc@mail.com")
+                .name("abc")
+                .isCompany(true)
+                .companyName(input)
+                .phoneNo("1515155")
+                .address(AddressDTO.builder()
+                        .city("Warsaw")
+                        .flatNo(7)
+                        .streetNo(44)
+                        .street("Ordynacka")
+                        .build())
+                .build();
+        //then
+        final BadRequestException exception = assertThrows(BadRequestException.class, () -> customerService.setCustomer(customer));
+        assertEquals(HttpStatus.BAD_REQUEST.toString(), exception.getCode());
+        assertEquals("Customer type company requires companyNip and companyName", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should throw BadRequestException when customer request is null")
+    public void shouldCreateCustomerInSetCustomer() {
+        final BadRequestException exception = assertThrows(BadRequestException.class, () -> customerService.setCustomer(null));
+        assertEquals(HttpStatus.BAD_REQUEST.toString(), exception.getCode());
+        assertEquals("Customer request can not be null", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should set customer")
+    public void shouldSetCustomer() {
+        //given
+        final SetCustomer customer = SetCustomer.builder()
+                .id(1L)
+                .email("abc@mail.com")
+                .name("abc")
+                .isCompany(false)
+                .phoneNo("1515155")
+                .address(AddressDTO.builder()
+                        .city("Warsaw")
+                        .flatNo(7)
+                        .streetNo(44)
+                        .street("Ordynacka")
+                        .build())
+                .build();
+        //when
+        Mockito.when(customerRepository.findById(1L)).thenReturn(Optional.of(Customer.builder().id(1L).build()));
+        Mockito.when(customerRepository.save(Mockito.any())).thenReturn(Customer.builder().id(1L).build());
+        //then
+        assertDoesNotThrow(()->customerService.setCustomer(customer));
     }
 }

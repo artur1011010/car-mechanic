@@ -2,18 +2,19 @@ package pl.artur.zaczek.car.mechanic.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import pl.artur.zaczek.car.mechanic.jpa.AddressRepository;
 import pl.artur.zaczek.car.mechanic.jpa.CustomerRepository;
 import pl.artur.zaczek.car.mechanic.model.Customer;
-import pl.artur.zaczek.car.mechanic.rest.error.BadRequestException;
 import pl.artur.zaczek.car.mechanic.rest.error.NotFoundException;
 import pl.artur.zaczek.car.mechanic.rest.model.CreateCustomer;
 import pl.artur.zaczek.car.mechanic.rest.model.CustomerResponse;
+import pl.artur.zaczek.car.mechanic.rest.model.SetCustomer;
 import pl.artur.zaczek.car.mechanic.service.CustomerService;
 import pl.artur.zaczek.car.mechanic.utils.CustomerMapper;
+import pl.artur.zaczek.car.mechanic.utils.ModelValidator;
 
 import java.util.HashSet;
 import java.util.List;
@@ -27,6 +28,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
     private final AddressRepository addressRepository;
     private final CustomerMapper customerMapper;
+    private final ModelValidator modelValidator;
 
     @Override
     public List<CustomerResponse> getCustomers() {
@@ -37,8 +39,9 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
+    @Transactional
     public Long createCustomer(final CreateCustomer customerRequest) {
-        validateCreateCustomerRequest(customerRequest);
+        modelValidator.validateCreateCustomerRequest(customerRequest);
         final Customer customer = customerMapper.createCustomerRequestToCustomerMapper(customerRequest);
         customer.setVehicleSet(new HashSet<>());
         addressRepository.save(customer.getAddress());
@@ -47,23 +50,36 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerResponse getCustomerById(final Long userId) {
-        return customerRepository.findById(userId)
+    public CustomerResponse getCustomerById(final Long customerId) {
+        return customerRepository.findById(customerId)
                 .map(customerMapper::customerToResponse)
                 .orElseThrow(() -> {
-                    log.error("User not found for user id:{}", userId);
-                    throw new NotFoundException("User with id: " + userId + " not found", HttpStatus.NOT_FOUND.name());
+                    log.error("Customer not found for user id:{}", customerId);
+                    throw new NotFoundException("Customer with id: " + customerId + " not found", HttpStatus.NOT_FOUND.name());
                 });
     }
 
-    private void validateCreateCustomerRequest(final CreateCustomer customerRequest) {
-        if (customerRequest == null) {
-            log.error("Customer request can not be null");
-            throw new BadRequestException("Customer request can not be null", HttpStatus.BAD_REQUEST.toString());
+    @Override
+    @Transactional
+    public void setCustomer(final SetCustomer customerRequest) {
+        modelValidator.validateSetCustomerRequest(customerRequest);
+        long customerId = customerRequest.getId();
+        final Customer customer = customerRepository.findById(customerId)
+                .orElseThrow(() -> {
+                    log.error("Customer not found for user id:{}", customerId);
+                    throw new NotFoundException("Customer with id: " + customerId + " not found", HttpStatus.NOT_FOUND.name());
+                });
+        if(customerRequest.getAddress() != null){
+            customer.setAddress(customerMapper.addressDTOToAddress(customerRequest.getAddress()));
         }
-        if (customerRequest.isCompany() && (StringUtils.isBlank(customerRequest.getCompanyNip()) || StringUtils.isBlank(customerRequest.getCompanyName()))) {
-            log.error("Customer type company requires companyNip and companyName: {}", customerRequest);
-            throw new BadRequestException("Customer type company requires companyNip and companyName", HttpStatus.BAD_REQUEST.toString());
-        }
+        customer.setCompany(customerRequest.isCompany());
+        customer.setCompanyName(customerRequest.getCompanyName());
+        customer.setCompanyNip(customerRequest.getCompanyNip());
+        customer.setName(customerRequest.getName());
+        customer.setLastName(customerRequest.getLastName());
+        customer.setEmail(customerRequest.getEmail());
+        customer.setPhoneNo(customerRequest.getPhoneNo());
+        customer.setSecondPhoneNo(customerRequest.getSecondPhoneNo());
+        customerRepository.save(customer);
     }
 }

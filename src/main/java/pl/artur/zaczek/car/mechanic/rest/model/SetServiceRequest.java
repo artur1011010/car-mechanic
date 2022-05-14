@@ -5,6 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
@@ -12,16 +14,17 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ServiceRequestResponse {
+public class SetServiceRequest {
+    @NotNull
     private long id;
+    @NotBlank
     private String title;
     private String comment;
+    @NotNull
     private LocalDateTime startTime;
+    @NotNull
     private LocalDateTime finishTime;
-    private LocalDateTime createdTime;
-    private LocalDateTime modifiedTime;
-    private String createdUser;
-    private String modifiedUser;
+    @NotNull
     private boolean isDone;
     private BigDecimal price;
     private BigDecimal discount;

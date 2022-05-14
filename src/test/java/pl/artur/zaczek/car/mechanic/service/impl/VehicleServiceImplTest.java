@@ -19,13 +19,13 @@ import pl.artur.zaczek.car.mechanic.model.Vehicle;
 import pl.artur.zaczek.car.mechanic.rest.error.NotFoundException;
 import pl.artur.zaczek.car.mechanic.rest.model.CreateVehicle;
 import pl.artur.zaczek.car.mechanic.rest.model.EngineResponse;
+import pl.artur.zaczek.car.mechanic.rest.model.SetVehicle;
 import pl.artur.zaczek.car.mechanic.rest.model.VehicleResponse;
 import pl.artur.zaczek.car.mechanic.utils.VehicleMapper;
 
 import java.util.*;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)
 @SpringBootTest
@@ -46,6 +46,8 @@ class VehicleServiceImplTest {
     void setUp() {
         vehicleService = new VehicleServiceImpl(vehicleRepository, customerRepository, vehicleMapper);
     }
+
+    /***********  get vehicle  ***********/
 
     @Test
     @DisplayName("should return correct response")
@@ -215,5 +217,42 @@ class VehicleServiceImplTest {
         //then
         final Long actualResponse = vehicleService.createVehicle(request, 123L);
         assertEquals(1L, actualResponse);
+    }
+
+    /***********  set vehicle  ***********/
+
+    @Test
+    @DisplayName("should throw NotFoundException when vehicle is not found in set vehicle")
+    public void shouldThrowNotFoundExceptionWhenCustomerIsNotFoundInSetVehicle() {
+        //given
+        final SetVehicle request = SetVehicle.builder()
+                .id(1L)
+                .brand("test")
+                .color("red")
+                .vin("12133")
+                .build();
+        //when
+        Mockito.when(vehicleRepository.findById(1L)).thenReturn(Optional.empty());
+        final NotFoundException exception = assertThrows(NotFoundException.class,
+                () -> vehicleService.setVehicle(request));
+        assertEquals(HttpStatus.NOT_FOUND.name(), exception.getCode());
+        assertEquals("Vehicle with id: 1 not found", exception.getMessage());
+    }
+
+    @Test
+    @DisplayName("should set vehicle")
+    public void shouldSetVehicle() {
+        //given
+        final SetVehicle request = SetVehicle.builder()
+                .id(1L)
+                .brand("test")
+                .color("red")
+                .vin("12133")
+                .build();
+        //when
+        Mockito.when(vehicleRepository.findById(1L)).thenReturn(Optional.of(Vehicle.builder().build()));
+        Mockito.when(vehicleRepository.save(Mockito.any())).thenReturn(Vehicle.builder().id(1L).build());
+        //then
+        assertDoesNotThrow(() -> vehicleService.setVehicle(request));
     }
 }

@@ -20,6 +20,10 @@ public class ServiceRequest {
     private String comment;
     private LocalDateTime startTime;
     private LocalDateTime finishTime;
+    private LocalDateTime createdTime;
+    private LocalDateTime modifiedTime;
+    private String createdUser;
+    private String modifiedUser;
     private boolean isDone;
     private BigDecimal price;
     private BigDecimal discount;

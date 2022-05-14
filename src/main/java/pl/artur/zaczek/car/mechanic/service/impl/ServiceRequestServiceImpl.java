@@ -15,9 +15,11 @@ import pl.artur.zaczek.car.mechanic.rest.error.NotFoundException;
 import pl.artur.zaczek.car.mechanic.rest.error.NotImplementedException;
 import pl.artur.zaczek.car.mechanic.rest.model.CreateServiceRequest;
 import pl.artur.zaczek.car.mechanic.rest.model.ServiceRequestResponse;
+import pl.artur.zaczek.car.mechanic.rest.model.SetServiceRequest;
 import pl.artur.zaczek.car.mechanic.service.ServiceRequestService;
 import pl.artur.zaczek.car.mechanic.utils.ServiceRequestMapper;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -26,6 +28,8 @@ import java.util.stream.Collectors;
 @Service
 @Slf4j
 public class ServiceRequestServiceImpl implements ServiceRequestService {
+
+    private final String API_USER = "API_USER";
 
     private final ServiceRequestRepository serviceRequestRepository;
     private final CustomerRepository customerRepository;
@@ -107,8 +111,32 @@ public class ServiceRequestServiceImpl implements ServiceRequestService {
         vehicle.addCustomer(customer);
         serviceRequest.setCustomer(customer);
         serviceRequest.setVehicle(vehicle);
+        serviceRequest.setCreatedTime(LocalDateTime.now());
+        serviceRequest.setCreatedUser(API_USER);
         serviceRequestRepository.save(serviceRequest);
         vehicleRepository.save(vehicle);
         return serviceRequest.getId();
+    }
+
+    @Override
+    @Transactional
+    public void setSR(final SetServiceRequest request) {
+        final long srId = request.getId();
+        final ServiceRequest serviceRequest = serviceRequestRepository
+                .findById(srId)
+                .orElseThrow(() -> {
+                    log.error("Service request not found with id:{}", srId);
+                    throw new NotFoundException("Service request id: " + srId + " not found", HttpStatus.NOT_FOUND.name());
+                });
+        serviceRequest.setModifiedTime(LocalDateTime.now());
+        serviceRequest.setModifiedUser(API_USER);
+        serviceRequest.setTitle(request.getTitle());
+        serviceRequest.setComment(request.getComment());
+        serviceRequest.setStartTime(request.getStartTime());
+        serviceRequest.setFinishTime(request.getFinishTime());
+        serviceRequest.setDone(request.isDone());
+        serviceRequest.setPrice(request.getPrice());
+        serviceRequest.setDiscount(request.getDiscount());
+        serviceRequestRepository.save(serviceRequest);
     }
 }

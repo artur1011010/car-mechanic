@@ -16,4 +16,4 @@ Application based on Java 11/Spring, integration test written in Groovy
 
 ## Demo
 
-[Swagger doc](https://car-mechanic-api.herokuapp.com/swagger-ui/)
+[Swagger doc](https://car-mechanic-api2022.herokuapp.com/swagger-ui/)
